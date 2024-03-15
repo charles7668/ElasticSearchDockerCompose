@@ -1,0 +1,32 @@
+version: '3'
+networks:
+  elastic_network:
+    driver: bridge
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+    container_name: es01
+    environment:
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+    networks:
+      elastic_network:
+       aliases:
+        - es1
+    volumes:
+      - ./Data:/usr/share/elasticsearch/Data
+    mem_limit: 1g
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.12.2
+    container_name: kibana01
+    environment:
+      - ELASTICSEARCH_HOSTS=http://es1:9200
+    networks:
+      elastic_network:
+       aliases:
+        - kibana1
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
